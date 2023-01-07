@@ -1180,9 +1180,16 @@ pub trait Offchain {
 			.submit_transaction(data)
 	}
 
-    // john
 	/// Returns information about the local node's network state.
 	fn network_state(&mut self) -> Result<OpaqueNetworkState, ()> {
+		self.extension::<OffchainWorkerExt>()
+			.expect("network_state can be called only in the offchain worker context")
+			.network_state()
+	}
+
+    // john
+	/// Returns information about the local node's network state.
+	fn network_state1(&mut self) -> Result<OpaqueNetworkState, ()> {
 		self.extension::<OffchainWorkerExt>()
 			.expect("network_state can be called only in the offchain worker context")
 			.network_state1()
