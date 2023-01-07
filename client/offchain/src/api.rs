@@ -165,6 +165,14 @@ impl offchain::Externalities for Api {
 		Ok(OpaqueNetworkState::from(state))
 	}
 
+    // john
+	fn network_state1(&self) -> Result<OpaqueNetworkState, ()> {
+		let external_addresses = self.network_provider.external_addresses();
+
+		let state = NetworkState::new(self.network_provider.local_peer_id(), external_addresses);
+		Ok(OpaqueNetworkState::from(state))
+	}
+
 	fn timestamp(&mut self) -> Timestamp {
 		timestamp::now()
 	}
