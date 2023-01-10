@@ -556,6 +556,12 @@ impl<T: Externalities> Externalities for LimitedExternalities<T> {
 		self.externalities.random_seed()
 	}
 
+    // john
+	fn random_range(&mut self) -> [u8; 32] {
+		self.check(Capabilities::RANDOMNESS, "random_range");
+		self.externalities.random_range()
+	}
+
 	fn http_request_start(
 		&mut self,
 		method: &str,

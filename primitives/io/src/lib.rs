@@ -1187,14 +1187,6 @@ pub trait Offchain {
 			.network_state()
 	}
 
-    // john
-	/// Returns information about the local node's network state.
-	fn network_state1(&mut self) -> Result<OpaqueNetworkState, ()> {
-		self.extension::<OffchainWorkerExt>()
-			.expect("network_state can be called only in the offchain worker context")
-			.network_state1()
-	}
-
 	/// Returns current UNIX timestamp (in millis)
 	fn timestamp(&mut self) -> Timestamp {
 		self.extension::<OffchainWorkerExt>()
@@ -1217,6 +1209,13 @@ pub trait Offchain {
 		self.extension::<OffchainWorkerExt>()
 			.expect("random_seed can be called only in the offchain worker context")
 			.random_seed()
+	}
+
+    // john
+	fn random_range(&mut self) -> u32 {
+		self.extension::<OffchainWorkerExt>()
+			.expect("random_range can be called only in the offchain worker context")
+			.random_range()
 	}
 
 	/// Sets a value in the local storage.

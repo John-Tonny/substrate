@@ -32,6 +32,10 @@ use sp_core::{
 };
 pub use sp_offchain::STORAGE_PREFIX;
 
+use rand::Rng;
+use rand::prelude::*;
+
+
 mod http;
 
 mod timestamp;
@@ -165,14 +169,6 @@ impl offchain::Externalities for Api {
 		Ok(OpaqueNetworkState::from(state))
 	}
 
-    // john
-	fn network_state1(&self) -> Result<OpaqueNetworkState, ()> {
-		let external_addresses = self.network_provider.external_addresses();
-
-		let state = NetworkState::new(self.network_provider.local_peer_id(), external_addresses);
-		Ok(OpaqueNetworkState::from(state))
-	}
-
 	fn timestamp(&mut self) -> Timestamp {
 		timestamp::now()
 	}
@@ -183,6 +179,12 @@ impl offchain::Externalities for Api {
 
 	fn random_seed(&mut self) -> [u8; 32] {
 		rand::random()
+	}
+
+    // john
+	fn random_range(&mut self) -> [u8; 32] {
+        let mut random = rand::thread_rng();
+        random.gen_range(60u32, 100u32)
 	}
 
 	fn http_request_start(

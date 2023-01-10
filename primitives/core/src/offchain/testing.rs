@@ -232,6 +232,11 @@ impl offchain::Externalities for TestOffchainExt {
 		self.0.read().seed
 	}
 
+    // john
+	fn random_range(&mut self) -> u32 {
+		10u32
+	}
+
 	fn http_request_start(
 		&mut self,
 		method: &str,
