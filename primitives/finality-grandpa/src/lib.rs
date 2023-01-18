@@ -533,5 +533,6 @@ sp_api::decl_runtime_apis! {
 
 		/// Get current GRANDPA authority set id.
 		fn current_set_id() -> SetId;
+
 	}
 }

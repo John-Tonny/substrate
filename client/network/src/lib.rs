@@ -260,6 +260,8 @@ pub mod error;
 pub mod network_state;
 pub mod transactions;
 
+use network_state::NetworkState;
+
 #[doc(inline)]
 pub use libp2p::{multiaddr, Multiaddr, PeerId};
 pub use protocol::{
@@ -304,6 +306,9 @@ pub trait NetworkStateInfo {
 
 	/// Returns the local Peer ID.
 	fn local_peer_id(&self) -> PeerId;
+
+	// john
+	fn rpc_http_port(&self) -> u16;
 }
 
 /// Overview status of the network.

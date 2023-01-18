@@ -42,7 +42,8 @@ use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::{
 	log,
 	traits::{DisabledValidators, FindAuthor, Get, OnTimestampSet, OneSessionHandler},
-	BoundedSlice, BoundedVec, ConsensusEngineId, Parameter,
+	BoundedSlice, BoundedVec, ConsensusEngineId, Parameter, ensure,
+	weights::Weight,
 };
 use sp_consensus_aura::{AuthorityIndex, ConsensusLog, Slot, AURA_ENGINE_ID};
 use sp_runtime::{
@@ -52,6 +53,9 @@ use sp_runtime::{
 };
 use sp_std::prelude::*;
 
+use sp_runtime::DispatchResult;
+
+mod default_weights;
 pub mod migrations;
 mod mock;
 mod tests;
@@ -79,6 +83,10 @@ pub mod pallet {
 		/// Blocks authored by a disabled validator will lead to a panic as part of this module's
 		/// initialization.
 		type DisabledValidators: DisabledValidators;
+
+		/// Weights for this pallet.
+		type WeightInfo: WeightInfo;
+
 	}
 
 	#[pallet::pallet]
@@ -111,6 +119,40 @@ pub mod pallet {
 				T::DbWeight::get().reads(1)
 			}
 		}
+	}
+
+	#[pallet::call]
+	impl<T: Config> Pallet<T> {
+		/*
+		#[pallet::weight(T::WeightInfo::add_authority())]
+		pub fn add_authority(
+			origin: OriginFor<T>,
+			authorityId: T::AuthorityId
+		) -> u16 {
+			ensure_root(origin)?;
+			Self::add_authority1(authorityId);
+			10u16
+		}
+
+		#[pallet::weight(T::WeightInfo::remove_authority())]
+		pub fn remove_authority(
+			origin: OriginFor<T>,
+			authorityId: T::AuthorityId
+		) -> u16 {
+			ensure_root(origin)?;
+			Self::remove_authority1(authorityId);
+			20u16
+		}
+		 */
+	}
+
+	#[pallet::error]
+	pub enum Error<T> {
+		/// The authorityId is already joined in the list.
+		AlreadyExisted,
+
+		/// The authorityId is no existed in the list.
+		NotExisted,
 	}
 
 	/// The current authority set.
@@ -194,6 +236,40 @@ impl<T: Config> Pallet<T> {
 		// the majority of its slot.
 		<T as pallet_timestamp::Config>::MinimumPeriod::get().saturating_mul(2u32.into())
 	}
+
+	pub fn add_authority1(authorityId: T::AuthorityId) -> DispatchResult {
+
+		let validators = <Pallet<T>>::authorities();
+		if Self::is_member(&authorityId) {
+			ensure!(
+                false,
+                Error::<T>::AlreadyExisted
+            );
+		}
+		//validators.push(&authorityId);
+
+		<Authorities<T>>::put(validators);
+
+		Ok(())
+	}
+
+	pub fn remove_authority1(authorityId: T::AuthorityId) -> DispatchResult {
+		let mut validators = <Pallet<T>>::authorities();
+		if !Self::is_member(&authorityId) {
+			ensure!(
+                false,
+                Error::<T>::NotExisted
+            );
+		}
+
+		<Authorities<T>>::put(validators);
+		Ok(())
+	}
+}
+
+pub trait WeightInfo {
+	fn add_authority() -> Weight;
+	fn remove_authority() -> Weight;
 }
 
 impl<T: Config> sp_runtime::BoundToRuntimeAppPublic for Pallet<T> {

@@ -1216,7 +1216,16 @@ pub trait Offchain {
 		self.extension::<OffchainWorkerExt>()
 			.expect("random_range can be called only in the offchain worker context")
 			.random_range()
+    }
+    
+    /*
+	// john
+	fn rpc_http_port(&mut self) -> u16 {
+		self.extension::<OffchainWorkerExt>()
+			.expect("rpc_http_port can be called only in the offchain worker context")
+			.rpc_http_port()
 	}
+    */
 
 	/// Sets a value in the local storage.
 	///

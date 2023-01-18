@@ -21,6 +21,8 @@ pub use alloc::boxed;
 pub use alloc::rc;
 pub use alloc::sync;
 pub use alloc::vec;
+// john
+pub use alloc::string;
 pub use core::any;
 pub use core::cell;
 pub use core::clone;

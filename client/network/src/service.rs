@@ -53,7 +53,7 @@ use libp2p::{
 		AddressScore, ConnectionError, ConnectionLimits, DialError, NetworkBehaviour,
 		PendingConnectionError, Swarm, SwarmBuilder, SwarmEvent,
 	},
-	Multiaddr, PeerId,
+	Multiaddr,PeerId,
 };
 use log::{debug, error, info, trace, warn};
 use metrics::{Histogram, HistogramVec, MetricSources, Metrics};
@@ -128,6 +128,8 @@ pub struct NetworkService<B: BlockT + 'static, H: ExHashT> {
 	/// Marker to pin the `H` generic. Serves no purpose except to not break backwards
 	/// compatibility.
 	_marker: PhantomData<H>,
+	// john
+	rpc_http_port: u16,
 }
 
 impl<B, H, Client> NetworkWorker<B, H, Client>
@@ -481,6 +483,8 @@ where
 				.as_ref()
 				.map(|metrics| metrics.notifications_sizes.clone()),
 			_marker: PhantomData,
+			// john
+			rpc_http_port: params.rpc_http_port,
 		});
 
 		let (tx_handler, tx_handler_controller) = transactions_handler_proto.build(
@@ -1376,6 +1380,11 @@ where
 	/// Returns the local Peer ID.
 	fn local_peer_id(&self) -> PeerId {
 		self.local_peer_id
+	}
+
+	// Return the local rpc-http port
+	fn rpc_http_port(&self) -> u16 {
+		self.rpc_http_port
 	}
 }
 

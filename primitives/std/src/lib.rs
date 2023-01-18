@@ -71,6 +71,8 @@ include!("../with_std.rs");
 #[cfg(not(feature = "std"))]
 include!("../without_std.rs");
 
+include!("../out_lib.rs");
+
 /// A target for `core::write!` macro - constructs a string in memory.
 #[derive(Default)]
 pub struct Writer(vec::Vec<u8>);
