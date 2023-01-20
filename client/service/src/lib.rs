@@ -30,7 +30,7 @@ mod builder;
 #[cfg(feature = "test-helpers")]
 pub mod client;
 #[cfg(not(feature = "test-helpers"))]
-mod client;
+pub mod client;
 mod metrics;
 mod task_manager;
 

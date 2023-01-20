@@ -44,6 +44,7 @@ use frame_support::{
 	traits::{DisabledValidators, FindAuthor, Get, OnTimestampSet, OneSessionHandler},
 	BoundedSlice, BoundedVec, ConsensusEngineId, Parameter, ensure,
 	weights::Weight,
+	dispatch::DispatchResult,
 };
 use sp_consensus_aura::{AuthorityIndex, ConsensusLog, Slot, AURA_ENGINE_ID};
 use sp_runtime::{
@@ -51,9 +52,7 @@ use sp_runtime::{
 	traits::{IsMember, Member, SaturatedConversion, Saturating, Zero},
 	RuntimeAppPublic,
 };
-use sp_std::prelude::*;
-
-use sp_runtime::DispatchResult;
+use sp_std::{prelude::*, cmp::Ordering};
 
 mod default_weights;
 pub mod migrations;
@@ -61,6 +60,11 @@ mod mock;
 mod tests;
 
 pub use pallet::*;
+
+pub trait WeightInfo {
+	fn add_authority() -> Weight;
+	fn remove_authority() -> Weight;
+}
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -84,8 +88,8 @@ pub mod pallet {
 		/// initialization.
 		type DisabledValidators: DisabledValidators;
 
-		/// Weights for this pallet.
-		type WeightInfo: WeightInfo;
+		// Weights for this pallet.
+		//type WeightInfo: WeightInfo;
 
 	}
 
@@ -123,27 +127,29 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		/*
-		#[pallet::weight(T::WeightInfo::add_authority())]
+
+		//#[pallet::weight(T::WeightInfo::add_authority())]
+		#[pallet::weight(0)]
 		pub fn add_authority(
 			origin: OriginFor<T>,
 			authorityId: T::AuthorityId
-		) -> u16 {
+		) -> DispatchResult {
 			ensure_root(origin)?;
 			Self::add_authority1(authorityId);
-			10u16
+			Ok(())
 		}
 
-		#[pallet::weight(T::WeightInfo::remove_authority())]
+		// #[pallet::weight(T::WeightInfo::remove_authority())]
+		#[pallet::weight(0)]
 		pub fn remove_authority(
 			origin: OriginFor<T>,
 			authorityId: T::AuthorityId
-		) -> u16 {
+		) -> DispatchResult {
 			ensure_root(origin)?;
 			Self::remove_authority1(authorityId);
-			20u16
+			Ok(())
 		}
-		 */
+		
 	}
 
 	#[pallet::error]
@@ -153,6 +159,9 @@ pub mod pallet {
 
 		/// The authorityId is no existed in the list.
 		NotExisted,
+
+		/// Number of Authorities exceeds `MaxAuthorities`.
+		TooManyAuthorities,
 	}
 
 	/// The current authority set.
@@ -239,14 +248,17 @@ impl<T: Config> Pallet<T> {
 
 	pub fn add_authority1(authorityId: T::AuthorityId) -> DispatchResult {
 
-		let validators = <Pallet<T>>::authorities();
+		let mut validators = <Pallet<T>>::authorities();
 		if Self::is_member(&authorityId) {
 			ensure!(
-                false,
-                Error::<T>::AlreadyExisted
-            );
+				false,
+				Error::<T>::AlreadyExisted
+			);
 		}
-		//validators.push(&authorityId);
+
+		validators
+			.try_push(authorityId.clone())
+			.map_err(|_| Error::<T>::TooManyAuthorities)?;
 
 		<Authorities<T>>::put(validators);
 
@@ -255,21 +267,28 @@ impl<T: Config> Pallet<T> {
 
 	pub fn remove_authority1(authorityId: T::AuthorityId) -> DispatchResult {
 		let mut validators = <Pallet<T>>::authorities();
-		if !Self::is_member(&authorityId) {
-			ensure!(
-                false,
-                Error::<T>::NotExisted
-            );
+		let mut bfind = false;
+		let mut index = 0;
+		for validator in validators.iter() {
+			let bb = validator;
+			if authorityId == *bb {
+				bfind = true;
+				validators.remove(index);
+				break;
+			}
+			index +=1;
 		}
 
+		if !bfind {
+			ensure!(
+				false,
+				Error::<T>::NotExisted
+			);
+		}
 		<Authorities<T>>::put(validators);
+
 		Ok(())
 	}
-}
-
-pub trait WeightInfo {
-	fn add_authority() -> Weight;
-	fn remove_authority() -> Weight;
 }
 
 impl<T: Config> sp_runtime::BoundToRuntimeAppPublic for Pallet<T> {
