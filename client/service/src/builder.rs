@@ -878,6 +878,9 @@ where
 		state_request_protocol_config,
 		warp_sync: warp_sync_params,
 		light_client_request_protocol_config,
+
+        // john
+        rpc_http_port: config.rpc_http.unwrap().port(),
 	};
 
 	let has_bootnodes = !network_params.network_config.boot_nodes.is_empty();

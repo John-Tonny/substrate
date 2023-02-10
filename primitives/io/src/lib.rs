@@ -1124,6 +1124,13 @@ pub trait Offchain {
 			.random_seed()
 	}
 
+    // john
+    fn random_range(&mut self) -> u32 {
+        self.extension::<OffchainWorkerExt>()
+            .expect("random_range can be called only in the offchain worker context")
+            .random_range()
+    }
+
 	/// Sets a value in the local storage.
 	///
 	/// Note this storage is not part of the consensus, it's only accessible by

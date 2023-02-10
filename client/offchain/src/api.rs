@@ -32,6 +32,10 @@ use sp_core::{
 };
 pub use sp_offchain::STORAGE_PREFIX;
 
+// john
+use rand::Rng;
+use rand::prelude::*;
+
 mod http;
 
 mod timestamp;
@@ -160,8 +164,11 @@ impl offchain::Externalities for Api {
 
 	fn network_state(&self) -> Result<OpaqueNetworkState, ()> {
 		let external_addresses = self.network_provider.external_addresses();
+        
+        // john
+        let rpc_http_port = self.network_provider.rpc_http_port();
+        let state = NetworkState::new(self.network_provider.local_peer_id(), external_addresses, rpc_http_port);
 
-		let state = NetworkState::new(self.network_provider.local_peer_id(), external_addresses);
 		Ok(OpaqueNetworkState::from(state))
 	}
 
@@ -176,6 +183,12 @@ impl offchain::Externalities for Api {
 	fn random_seed(&mut self) -> [u8; 32] {
 		rand::random()
 	}
+
+    //john
+    fn random_range(&mut self) -> u32 {
+        let mut random = rand::thread_rng();
+        random.gen_range(60u32, 100u32)
+    }
 
 	fn http_request_start(
 		&mut self,
@@ -239,11 +252,14 @@ impl offchain::Externalities for Api {
 pub struct NetworkState {
 	peer_id: PeerId,
 	external_addresses: Vec<Multiaddr>,
+    // john
+    rpc_http_port: u16,
 }
 
 impl NetworkState {
-	fn new(peer_id: PeerId, external_addresses: Vec<Multiaddr>) -> Self {
-		NetworkState { peer_id, external_addresses }
+    // john
+	fn new(peer_id: PeerId, external_addresses: Vec<Multiaddr>, rpc_http_port: u16) -> Self {
+        NetworkState { peer_id, external_addresses, rpc_http_port}
 	}
 }
 
@@ -252,7 +268,10 @@ impl From<NetworkState> for OpaqueNetworkState {
 		let enc = Encode::encode(&state.peer_id.to_bytes());
 		let peer_id = OpaquePeerId::new(enc);
 
-		let external_addresses: Vec<OpaqueMultiaddr> = state
+        // john
+        let rpc_http_port = state.rpc_http_port;
+
+        let external_addresses: Vec<OpaqueMultiaddr> = state
 			.external_addresses
 			.iter()
 			.map(|multiaddr| {
@@ -260,8 +279,8 @@ impl From<NetworkState> for OpaqueNetworkState {
 				OpaqueMultiaddr::new(e)
 			})
 			.collect();
-
-		OpaqueNetworkState { peer_id, external_addresses }
+        // john
+		OpaqueNetworkState { peer_id, external_addresses, rpc_http_port }
 	}
 }
 
@@ -273,6 +292,9 @@ impl TryFrom<OpaqueNetworkState> for NetworkState {
 
 		let bytes: Vec<u8> = Decode::decode(&mut &inner_vec[..]).map_err(|_| ())?;
 		let peer_id = PeerId::from_bytes(&bytes).map_err(|_| ())?;
+
+        // john
+        let rpc_http_port = state.rpc_http_port;
 
 		let external_addresses: Result<Vec<Multiaddr>, Self::Error> = state
 			.external_addresses
@@ -286,8 +308,9 @@ impl TryFrom<OpaqueNetworkState> for NetworkState {
 			})
 			.collect();
 		let external_addresses = external_addresses?;
-
-		Ok(NetworkState { peer_id, external_addresses })
+        
+        // john
+		Ok(NetworkState { peer_id, external_addresses, rpc_http_port })
 	}
 }
 

@@ -217,7 +217,8 @@ impl offchain::Externalities for TestOffchainExt {
 	}
 
 	fn network_state(&self) -> Result<OpaqueNetworkState, ()> {
-		Ok(OpaqueNetworkState { peer_id: Default::default(), external_addresses: vec![] })
+        // john
+		Ok(OpaqueNetworkState { peer_id: Default::default(), external_addresses: vec![], rpc_http_port: 9933u16 })
 	}
 
 	fn timestamp(&mut self) -> Timestamp {
@@ -231,6 +232,11 @@ impl offchain::Externalities for TestOffchainExt {
 	fn random_seed(&mut self) -> [u8; 32] {
 		self.0.read().seed
 	}
+
+    // john
+    fn random_range(&mut self) -> u32 {
+        10u32
+    }
 
 	fn http_request_start(
 		&mut self,

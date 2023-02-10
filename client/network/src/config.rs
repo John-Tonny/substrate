@@ -134,6 +134,9 @@ pub struct Params<B: BlockT, H: ExHashT> {
 
 	/// Optional warp sync protocol support. Include protocol config and sync provider.
 	pub warp_sync: Option<(Arc<dyn WarpSyncProvider<B>>, RequestResponseConfig)>,
+
+    // john
+    pub rpc_http_port: u16,
 }
 
 /// Role of the local node.

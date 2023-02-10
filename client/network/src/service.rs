@@ -132,6 +132,9 @@ pub struct NetworkService<B: BlockT + 'static, H: ExHashT> {
 	/// Marker to pin the `H` generic. Serves no purpose except to not break backwards
 	/// compatibility.
 	_marker: PhantomData<H>,
+
+    // john
+    rpc_http_port: u16,
 }
 
 impl<B: BlockT + 'static, H: ExHashT> NetworkWorker<B, H> {
@@ -423,6 +426,8 @@ impl<B: BlockT + 'static, H: ExHashT> NetworkWorker<B, H> {
 				.as_ref()
 				.map(|metrics| metrics.notifications_sizes.clone()),
 			_marker: PhantomData,
+            // john
+            rpc_http_port: params.rpc_http_port,
 		});
 
 		let (tx_handler, tx_handler_controller) = transactions_handler_proto.build(
@@ -1320,6 +1325,12 @@ where
 	fn local_peer_id(&self) -> PeerId {
 		self.local_peer_id
 	}
+
+    // john
+    ///  Return the local rpc-http port
+    fn rpc_http_port(&self) -> u16 {
+        self.rpc_http_port
+    }
 }
 
 /// A `NotificationSender` allows for sending notifications to a peer with a chosen protocol.

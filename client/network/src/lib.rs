@@ -306,6 +306,9 @@ pub trait NetworkStateInfo {
 
 	/// Returns the local Peer ID.
 	fn local_peer_id(&self) -> PeerId;
+
+    // john
+    fn rpc_http_port(&self) -> u16;
 }
 
 /// Overview status of the network.
