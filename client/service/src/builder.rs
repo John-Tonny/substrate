@@ -927,6 +927,9 @@ where
 			])
 			.flatten()
 			.collect::<Vec<_>>(),
+
+        // john
+        rpc_http_port: config.rpc_http.unwrap().port(),
 	};
 
 	// crate transactions protocol and add it to the list of supported protocols of `network_params`

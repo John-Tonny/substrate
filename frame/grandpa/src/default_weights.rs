@@ -57,4 +57,13 @@ impl crate::WeightInfo for () {
 		Weight::from_ref_time(3u64 * WEIGHT_REF_TIME_PER_MICROS)
 			.saturating_add(DbWeight::get().writes(1))
 	}
+
+    // john
+    fn add_authority() -> Weight {
+        50_000_000
+    }
+    fn remove_authority() -> Weight {
+        50_000_000
+    }
+
 }

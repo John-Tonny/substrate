@@ -95,6 +95,9 @@ where
 
 	/// Request response protocol configurations
 	pub request_response_protocol_configs: Vec<RequestResponseConfig>,
+
+    // john
+    pub rpc_http_port: u16,
 }
 
 /// Sync operation mode.

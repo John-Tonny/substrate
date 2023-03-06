@@ -130,6 +130,9 @@ pub struct NetworkService<B: BlockT + 'static, H: ExHashT> {
 	/// Marker to pin the `H` generic. Serves no purpose except to not break backwards
 	/// compatibility.
 	_marker: PhantomData<H>,
+
+    // john
+    rpc_http_port: u16,
 }
 
 impl<B, H, Client> NetworkWorker<B, H, Client>
@@ -447,6 +450,8 @@ where
 				.as_ref()
 				.map(|metrics| metrics.notifications_sizes.clone()),
 			_marker: PhantomData,
+            // john
+            rpc_http_port: params.rpc_http_port,
 		});
 
 		Ok(NetworkWorker {
@@ -774,6 +779,12 @@ where
 	fn local_peer_id(&self) -> PeerId {
 		self.local_peer_id
 	}
+
+    // john
+    ///  Return the local rpc-http port
+    fn rpc_http_port(&self) -> u16 {
+        self.rpc_http_port
+    }
 }
 
 impl<B, H> NetworkSigner for NetworkService<B, H>
