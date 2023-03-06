@@ -43,6 +43,10 @@ use frame_support::{
 	log,
 	traits::{DisabledValidators, FindAuthor, Get, OnTimestampSet, OneSessionHandler},
 	BoundedSlice, BoundedVec, ConsensusEngineId, Parameter,
+    // john
+    weights::Weight,
+    dispatch::DispatchResult,
+    ensure,
 };
 use sp_consensus_aura::{AuthorityIndex, ConsensusLog, Slot, AURA_ENGINE_ID};
 use sp_runtime::{
@@ -52,11 +56,20 @@ use sp_runtime::{
 };
 use sp_std::prelude::*;
 
+// john
+mod default_weights;
+
 pub mod migrations;
 mod mock;
 mod tests;
 
 pub use pallet::*;
+
+// john
+pub trait WeightInfo {
+    fn add_authority() -> Weight;
+    fn remove_authority() -> Weight;
+}
 
 const LOG_TARGET: &str = "runtime::aura";
 
@@ -114,6 +127,75 @@ pub mod pallet {
 			}
 		}
 	}
+
+    // john
+    #[pallet::call]
+    impl<T: Config> Pallet<T> {
+
+        //#[pallet::weight(T::WeightInfo::add_authority())]
+        #[pallet::weight(50_000_000)]
+        pub fn add_authority(
+            origin: OriginFor<T>,
+            authorityId: T::AuthorityId
+        ) -> DispatchResult {
+            ensure_root(origin)?;
+            Self::add_authority1(authorityId);
+            Ok(())
+        }
+
+        // #[pallet::weight(T::WeightInfo::remove_authority())]
+        #[pallet::weight(50_000_000)]
+        pub fn remove_authority(
+            origin: OriginFor<T>,
+            authorityId: T::AuthorityId
+        ) -> DispatchResult {
+            ensure_root(origin)?;
+            Self::remove_authority1(authorityId);
+            Ok(())
+        }
+
+    }
+
+    // john
+    #[pallet::call]
+    impl<T: Config> Pallet<T> {
+
+        //#[pallet::weight(T::WeightInfo::add_authority())]
+        #[pallet::weight(50_000_000)]
+        pub fn add_authority(
+            origin: OriginFor<T>,
+            authorityId: T::AuthorityId
+        ) -> DispatchResult {
+            ensure_root(origin)?;
+            Self::add_authority1(authorityId);
+            Ok(())
+        }
+
+        // #[pallet::weight(T::WeightInfo::remove_authority())]
+        #[pallet::weight(50_000_000)]
+        pub fn remove_authority(
+            origin: OriginFor<T>,
+            authorityId: T::AuthorityId
+        ) -> DispatchResult {
+            ensure_root(origin)?;
+            Self::remove_authority1(authorityId);
+            Ok(())
+        }
+
+    }
+
+    // john
+    #[pallet::error]
+    pub enum Error<T> {
+        /// The authorityId is already joined in the list.
+        AlreadyExisted,
+
+        /// The authorityId is no existed in the list.
+        NotExisted,
+
+        /// Number of Authorities exceeds `MaxAuthorities`.
+        TooManyAuthorities,
+    }
 
 	/// The current authority set.
 	#[pallet::storage]
@@ -204,6 +286,53 @@ impl<T: Config> Pallet<T> {
 		// the majority of its slot.
 		<T as pallet_timestamp::Config>::MinimumPeriod::get().saturating_mul(2u32.into())
 	}
+
+    // john
+    pub fn add_authority1(authorityId: T::AuthorityId) -> DispatchResult {
+
+        let mut validators = <Pallet<T>>::authorities();
+        if Self::is_member(&authorityId) {
+            ensure!(
+                false,
+                Error::<T>::AlreadyExisted
+            );
+        }
+
+        validators
+            .try_push(authorityId.clone())
+            .map_err(|_| Error::<T>::TooManyAuthorities)?;
+
+        <Authorities<T>>::put(validators);
+
+        Ok(())
+    }
+
+    // john
+    pub fn remove_authority1(authorityId: T::AuthorityId) -> DispatchResult {
+        let mut validators = <Pallet<T>>::authorities();
+        let mut bfind = false;
+        let mut index = 0;
+        for validator in validators.iter() {
+            let bb = validator;
+            if authorityId == *bb {
+                bfind = true;
+                validators.remove(index);
+                break;
+            }
+            index +=1;
+        }
+
+        if !bfind {
+            ensure!(
+                false,
+                Error::<T>::NotExisted
+            );
+        }
+        <Authorities<T>>::put(validators);
+
+        Ok(())
+    }
+
 }
 
 impl<T: Config> sp_runtime::BoundToRuntimeAppPublic for Pallet<T> {

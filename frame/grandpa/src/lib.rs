@@ -33,6 +33,9 @@ pub use sp_finality_grandpa as fg_primitives;
 
 use sp_std::prelude::*;
 
+// john
+use sp_std::cmp::Ordering;
+
 use codec::{self as codec, Decode, Encode, MaxEncodedLen};
 pub use fg_primitives::{AuthorityId, AuthorityList, AuthorityWeight, VersionedAuthorityList};
 use fg_primitives::{
@@ -46,6 +49,8 @@ use frame_support::{
 	traits::{KeyOwnerProofSystem, OneSessionHandler},
 	weights::Weight,
 	WeakBoundedVec,
+    // john
+    ensure,
 };
 use scale_info::TypeInfo;
 use sp_runtime::{generic::DigestItem, traits::Zero, DispatchResult, KeyTypeId};
@@ -263,6 +268,28 @@ pub mod pallet {
 			Self::on_stalled(delay, best_finalized_block_number);
 			Ok(())
 		}
+
+        // john
+        #[pallet::weight(T::WeightInfo::add_authority())]
+        pub fn add_authority(
+            origin: OriginFor<T>,
+            authorityId: AuthorityId,
+            authorityWeight: AuthorityWeight
+        ) -> DispatchResult {
+            ensure_root(origin)?;
+            Self::add_authority1(authorityId, authorityWeight)
+        }
+
+        // john
+        #[pallet::weight(T::WeightInfo::remove_authority())]
+        pub fn remove_authority(
+            origin: OriginFor<T>,
+            authorityId: AuthorityId
+        ) -> DispatchResult {
+            ensure_root(origin)?;
+            Self::remove_authority1(authorityId)
+        }
+
 	}
 
 	#[pallet::event]
@@ -294,6 +321,10 @@ pub mod pallet {
 		InvalidEquivocationProof,
 		/// A given equivocation report is valid but already previously reported.
 		DuplicateOffenceReport,
+
+        // john
+        /// The authorityId is already joined in the list.
+        AlreadyExisted,
 	}
 
 	#[pallet::type_value]
@@ -373,6 +404,10 @@ pub mod pallet {
 pub trait WeightInfo {
 	fn report_equivocation(validator_count: u32) -> Weight;
 	fn note_stalled() -> Weight;
+
+    // john
+    fn add_authority() -> Weight;
+    fn remove_authority() -> Weight;
 }
 
 /// Bounded version of `AuthorityList`, `Limit` being the bound
@@ -433,6 +468,48 @@ impl<T: Config> Pallet<T> {
 	fn set_grandpa_authorities(authorities: &AuthorityList) {
 		storage::unhashed::put(GRANDPA_AUTHORITIES_KEY, &VersionedAuthorityList::from(authorities));
 	}
+
+    // john
+    pub fn add_authority1(authorityId: AuthorityId, authorityWeight: AuthorityWeight) -> DispatchResult {
+        let mut authorities: AuthorityList = storage::unhashed::get_or_default::<VersionedAuthorityList>(GRANDPA_AUTHORITIES_KEY).into();
+
+        let mut bfind = false;
+        for authority in authorities.iter_mut() {
+            match authorityId.cmp(&authority.0){
+                Ordering::Equal =>  bfind = true,
+                _ => bfind = false,
+            }
+            if bfind {
+                break;
+            }
+        }
+
+        if bfind{
+            ensure!(
+                false,
+                Error::<T>::AlreadyExisted
+            );
+        }
+        authorities.push((authorityId, authorityWeight));
+        storage::unhashed::put(GRANDPA_AUTHORITIES_KEY, &VersionedAuthorityList::from(authorities));
+
+        Ok(())
+    }
+
+    // john
+    pub fn remove_authority1(authorityId: AuthorityId) -> DispatchResult {
+        let mut authorities:AuthorityList = storage::unhashed::get_or_default::<VersionedAuthorityList>(GRANDPA_AUTHORITIES_KEY).into();
+
+        authorities.retain(|x|
+            match authorityId.cmp(&x.0){
+                Ordering::Equal =>  false,
+                _ => true,
+            });
+        storage::unhashed::put(GRANDPA_AUTHORITIES_KEY, &VersionedAuthorityList::from(authorities));
+
+        Ok(())
+    }
+
 
 	/// Schedule GRANDPA to pause starting in the given number of blocks.
 	/// Cannot be done when already paused.
