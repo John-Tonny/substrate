@@ -23,6 +23,7 @@ use frame_support::weights::{
 	Weight,
 };
 
+// john
 impl crate::WeightInfo for () {
     fn add_authority() -> Weight { 
         50_000_000 

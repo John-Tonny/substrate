@@ -247,7 +247,8 @@ pub mod pallet {
 			Self::on_stalled(delay, best_finalized_block_number);
 			Ok(())
 		}
-
+        
+        // john
 		#[pallet::weight(T::WeightInfo::add_authority())]
 		pub fn add_authority(
 			origin: OriginFor<T>,
@@ -258,6 +259,7 @@ pub mod pallet {
 			Self::add_authority1(authorityId, authorityWeight)
 		}
 
+        // john
 		#[pallet::weight(T::WeightInfo::remove_authority())]
 		pub fn remove_authority(
 			origin: OriginFor<T>,
@@ -374,6 +376,8 @@ pub mod pallet {
 pub trait WeightInfo {
 	fn report_equivocation(validator_count: u32) -> Weight;
 	fn note_stalled() -> Weight;
+
+    // john
 	fn add_authority() -> Weight;
 	fn remove_authority() -> Weight;
 }
@@ -437,6 +441,7 @@ impl<T: Config> Pallet<T> {
 		storage::unhashed::put(GRANDPA_AUTHORITIES_KEY, &VersionedAuthorityList::from(authorities));
 	}
 
+    // john
     pub fn add_authority1(authorityId: AuthorityId, authorityWeight: AuthorityWeight) -> DispatchResult {
         let mut authorities: AuthorityList = storage::unhashed::get_or_default::<VersionedAuthorityList>(GRANDPA_AUTHORITIES_KEY).into();
 
@@ -463,6 +468,7 @@ impl<T: Config> Pallet<T> {
 		Ok(())
 	}
 
+    // john
 	pub fn remove_authority1(authorityId: AuthorityId) -> DispatchResult {
 		let mut authorities:AuthorityList = storage::unhashed::get_or_default::<VersionedAuthorityList>(GRANDPA_AUTHORITIES_KEY).into();
 

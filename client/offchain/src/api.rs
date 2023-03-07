@@ -186,15 +186,8 @@ impl offchain::Externalities for Api {
     //john
     fn random_range(&mut self) -> u32 {
         let mut random = rand::thread_rng();
-        random.gen_range(20u32, 40u32)
+        random.gen_range(60u32, 120u32)
     }
-
-    /*
-    //john
-    fn rpc_http_port(&mut self) -> u16 {
-        self.network_provider.rpc_http_port()
-    }
-    */
 
 	fn http_request_start(
 		&mut self,

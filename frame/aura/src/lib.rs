@@ -54,6 +54,7 @@ use sp_runtime::{
 };
 use sp_std::{prelude::*, cmp::Ordering};
 
+// john
 mod default_weights;
 pub mod migrations;
 mod mock;
@@ -61,6 +62,7 @@ mod tests;
 
 pub use pallet::*;
 
+// john
 pub trait WeightInfo {
 	fn add_authority() -> Weight;
 	fn remove_authority() -> Weight;
@@ -125,6 +127,7 @@ pub mod pallet {
 		}
 	}
 
+    // john
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 
@@ -151,7 +154,8 @@ pub mod pallet {
 		}
 		
 	}
-
+    
+    // john
 	#[pallet::error]
 	pub enum Error<T> {
 		/// The authorityId is already joined in the list.
@@ -246,6 +250,7 @@ impl<T: Config> Pallet<T> {
 		<T as pallet_timestamp::Config>::MinimumPeriod::get().saturating_mul(2u32.into())
 	}
 
+    // john
 	pub fn add_authority1(authorityId: T::AuthorityId) -> DispatchResult {
 
 		let mut validators = <Pallet<T>>::authorities();
@@ -265,6 +270,7 @@ impl<T: Config> Pallet<T> {
 		Ok(())
 	}
 
+    // john
 	pub fn remove_authority1(authorityId: T::AuthorityId) -> DispatchResult {
 		let mut validators = <Pallet<T>>::authorities();
 		let mut bfind = false;
