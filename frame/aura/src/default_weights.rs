@@ -19,16 +19,18 @@
 //! This file was not auto-generated.
 
 use frame_support::weights::{
-	constants::{RocksDbWeight as DbWeight, WEIGHT_PER_MICROS, WEIGHT_PER_NANOS},
-	Weight,
+    constants::{RocksDbWeight as DbWeight, WEIGHT_REF_TIME_PER_MICROS, WEIGHT_REF_TIME_PER_NANOS},
+    Weight,
 };
 
 impl crate::WeightInfo for () {
     // john
     fn add_authority() -> Weight { 
-        50_000_000 
+        Weight::from_ref_time(3u64 * WEIGHT_REF_TIME_PER_MICROS)
+            .saturating_add(DbWeight::get().writes(1))
     }
     fn remove_authority() -> Weight { 
-        50_000_000 
+        Weight::from_ref_time(3u64 * WEIGHT_REF_TIME_PER_MICROS)
+            .saturating_add(DbWeight::get().writes(1))
     }
 }
