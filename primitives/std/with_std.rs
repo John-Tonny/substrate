@@ -36,6 +36,10 @@ pub use std::rc;
 pub use std::sync;
 pub use std::result;
 pub use std::slice;
+
+// john
+pub use std::string;
+
 pub use std::str;
 pub use core::time;
 pub use std::vec;
