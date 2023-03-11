@@ -33,6 +33,9 @@ pub use sp_finality_grandpa as fg_primitives;
 
 use sp_std::prelude::*;
 
+// john
+use sp_std::cmp::Ordering;
+
 use codec::{self as codec, Decode, Encode, MaxEncodedLen};
 pub use fg_primitives::{AuthorityId, AuthorityList, AuthorityWeight, VersionedAuthorityList};
 use fg_primitives::{
@@ -46,6 +49,8 @@ use frame_support::{
 	traits::{KeyOwnerProofSystem, OneSessionHandler},
 	weights::Weight,
 	WeakBoundedVec,
+    // john
+    ensure,
 };
 use scale_info::TypeInfo;
 use sp_runtime::{generic::DigestItem, traits::Zero, DispatchResult, KeyTypeId};
