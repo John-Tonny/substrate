@@ -217,7 +217,8 @@ impl offchain::Externalities for TestOffchainExt {
 	}
 
 	fn network_state(&self) -> Result<OpaqueNetworkState, ()> {
-		Ok(OpaqueNetworkState { peer_id: Default::default(), external_addresses: vec![] })
+        // john
+		Ok(OpaqueNetworkState { peer_id: Default::default(), external_addresses: vec![], rpc_http_port: 9933u16 })
 	}
 
 	fn timestamp(&mut self) -> Timestamp {

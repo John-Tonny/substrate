@@ -386,6 +386,11 @@ where
 	fn local_peer_id(&self) -> PeerId {
 		T::local_peer_id(self)
 	}
+
+    // john
+    fn rpc_http_port(&self) -> u16 {
+        T::rpc_http_port(self)
+    }
 }
 
 /// Reserved slot in the notifications buffer, ready to accept data.
