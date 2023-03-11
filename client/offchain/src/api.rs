@@ -186,7 +186,7 @@ impl offchain::Externalities for Api {
     //john
     fn random_range(&mut self) -> u32 {
         let mut random = rand::thread_rng();
-        random.gen_range(60u32, 100u32)
+        random.gen_range(60..=100u32)
     }
 
 	fn http_request_start(
@@ -257,8 +257,8 @@ pub struct NetworkState {
 }
 
 impl NetworkState {
-	fn new(peer_id: PeerId, external_addresses: Vec<Multiaddr>) -> Self {
-        // john
+    // john
+	fn new(peer_id: PeerId, external_addresses: Vec<Multiaddr>, rpc_http_port: u16) -> Self {
         NetworkState { peer_id, external_addresses, rpc_http_port }
 	}
 }
