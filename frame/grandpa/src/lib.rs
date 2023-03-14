@@ -406,7 +406,7 @@ pub trait WeightInfo {
 
     // john
     fn add_authority() -> Weight;
-    fn remove_authority() -> Weight
+    fn remove_authority() -> Weight;
 }
 
 /// Bounded version of `AuthorityList`, `Limit` being the bound

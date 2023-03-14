@@ -43,18 +43,17 @@ use frame_support::{
 	log,
 	traits::{DisabledValidators, FindAuthor, Get, OnTimestampSet, OneSessionHandler},
 	BoundedSlice, BoundedVec, ConsensusEngineId, Parameter,
+    //john
+    weights::Weight,
+    ensure,
+    dispatch::DispatchResult,
 };
 use sp_consensus_aura::{AuthorityIndex, ConsensusLog, Slot, AURA_ENGINE_ID};
 use sp_runtime::{
 	generic::DigestItem,
 	traits::{IsMember, Member, SaturatedConversion, Saturating, Zero},
 	RuntimeAppPublic,
-    // john
-    weights::Weight,
-    ensure,
-    dispatch::DispatchResult
 };
-
 use sp_std::prelude::*;
 
 // john
